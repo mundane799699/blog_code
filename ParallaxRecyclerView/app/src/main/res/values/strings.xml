@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ParallaxRecyclerView</string>
+    <item type="id" name="tag_position">
+    </item>
+    <item type="id" name="tag_second">
+    </item>
+</resources>
