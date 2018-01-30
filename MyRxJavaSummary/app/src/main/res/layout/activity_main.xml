@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:onClick="subscribe"
+            android:text="subscribe"
+            style="@style/btn"/>
+
+        <Button
+            android:onClick="onError"
+            android:text="错误处理"
+            style="@style/btn"/>
+
+        <Button
+            android:onClick="filter"
+            android:text="过滤"
+            style="@style/btn"/>
+
+        <Button
+            android:text="线程切换"
+            android:onClick="scheduler"
+            style="@style/btn"/>
+        <ImageView
+            android:id="@+id/iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:text="变换"
+            android:onClick="map"
+            style="@style/btn"/>
+
+        <Button
+            android:text="flatMap"
+            android:onClick="flatmap"
+            style="@style/btn"/>
+
+        <Button
+            android:text="compose"
+            android:onClick="compose"
+            style="@style/btn"/>
+
+        <Button
+            android:text="线程切换2"
+            android:onClick="scheduler2"
+            style="@style/btn"/>
+
+        <Button
+            android:text="doOnSubscribe"
+            android:onClick="doOnSubscribe"
+            style="@style/btn"/>
+
+        <Button
+            android:text="doOnNext"
+            android:onClick="doOnNext"
+            style="@style/btn"/>
+
+        <Button
+            android:text="timer"
+            android:onClick="timer"
+            style="@style/btn"/>
+
+        <Button
+            android:text="interval"
+            android:onClick="interval"
+            style="@style/btn"/>
+
+        <Button
+            android:id="@+id/btn"
+            android:text="throttleFirst"
+            style="@style/btn"/>
+
+        <Button
+            android:text="schedulePeriodically"
+            android:onClick="schedulePeriodically"
+            style="@style/btn"/>
+
+        <Button
+            android:text="retrywhen"
+            android:onClick="retrywhen"
+            style="@style/btn"/>
+
+        <Button
+            android:text="concat"
+            android:onClick="concat"
+            style="@style/btn"/>
+
+        <Button
+            android:text="zip"
+            android:onClick="zip"
+            style="@style/btn"/>
+
+        <Button
+            android:text="merge"
+            android:onClick="merge"
+            style="@style/btn"/>
+
+    </LinearLayout>
+
+
+
+</ScrollView>
