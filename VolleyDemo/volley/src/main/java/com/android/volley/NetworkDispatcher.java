@@ -1,0 +1,183 @@
+/*
+ * Copyright (C) 2011 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.android.volley;
+
+import android.annotation.TargetApi;
+import android.net.TrafficStats;
+import android.os.Build;
+import android.os.Process;
+import android.os.SystemClock;
+
+import java.util.concurrent.BlockingQueue;
+
+/**
+ * Provides a thread for performing network dispatch from a queue of requests.
+ *
+ * Requests added to the specified queue are processed from the network via a
+ * specified {@link Network} interface. Responses are committed to cache, if
+ * eligible, using a specified {@link Cache} interface. Valid responses and
+ * errors are posted back to the caller via a {@link ResponseDelivery}.
+ */
+public class NetworkDispatcher extends Thread {
+
+    /** The queue of requests to service. */
+    private final BlockingQueue<Request<?>> mQueue;
+    /** The network interface for processing requests. */
+    private final Network mNetwork;
+    /** The cache to write to. */
+    private final Cache mCache;
+    /** For posting responses and errors. */
+    private final ResponseDelivery mDelivery;
+    /** Used for telling us to die. */
+    private volatile boolean mQuit = false;
+
+    /**
+     * Creates a new network dispatcher thread.  You must call {@link #start()}
+     * in order to begin processing.
+     *
+     * @param queue Queue of incoming requests for triage
+     * @param network Network interface to use for performing requests
+     * @param cache Cache interface to use for writing responses to cache
+     * @param delivery Delivery interface to use for posting responses
+     */
+    public NetworkDispatcher(BlockingQueue<Request<?>> queue,
+            Network network, Cache cache, ResponseDelivery delivery) {
+        mQueue = queue;
+        mNetwork = network;
+        mCache = cache;
+        mDelivery = delivery;
+    }
+
+    /**
+     * Forces this dispatcher to quit immediately.  If any requests are still in
+     * the queue, they are not guaranteed to be processed.
+     */
+    public void quit() {
+        mQuit = true;
+        interrupt();
+    }
+
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    private void addTrafficStatsTag(Request<?> request) {
+        // Tag the request (if API >= 14)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            TrafficStats.setThreadStatsTag(request.getTrafficStatsTag());
+        }
+    }
+
+    @Override
+    public void run() {
+        // 设置线程优先级为background
+        Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+        while (true) {
+            try {
+                processRequest();
+            } catch (InterruptedException e) {
+                // We may have been interrupted because it was time to quit.
+                if (mQuit) {
+                    return;
+                }
+            }
+        }
+    }
+
+    // Extracted to its own method to ensure locals have a constrained liveness scope by the GC.
+    // This is needed to avoid keeping previous request references alive for an indeterminate amount
+    // of time. Update consumer-proguard-rules.pro when modifying this. See also
+    // https://github.com/google/volley/issues/114
+    private void processRequest() throws InterruptedException {
+        // Take a request from the queue.
+        // 从队列中取出request
+        Request<?> request = mQueue.take();
+
+        // 从启动开始过去的时间
+        long startTimeMs = SystemClock.elapsedRealtime();
+        try {
+            // 添加标记"已经从网络队列中取出"
+            request.addMarker("network-queue-take");
+
+            // If the request was cancelled already, do not perform the
+            // network request.
+            // 如果这个request已经被取消了, 不要再去执行这个request
+            if (request.isCanceled()) {
+                request.finish("network-discard-cancelled");
+                request.notifyListenerResponseNotUsable();
+                return;
+            }
+
+            addTrafficStatsTag(request);
+
+            // Perform the network request.
+            // 执行网络请求, 获取到response
+            NetworkResponse networkResponse = mNetwork.performRequest(request);
+            // 添加标记"http请求完成"
+            request.addMarker("network-http-complete");
+
+            // If the server returned 304 AND we delivered a response already,
+            // we're done -- don't deliver a second identical response.
+
+            // 如果返回了304, 并且request已经被分发过了
+            if (networkResponse.notModified && request.hasHadResponseDelivered()) {
+                // 结束请求
+                request.finish("not-modified");
+                // 通知所有listener没有造成任何可用的响应
+                request.notifyListenerResponseNotUsable();
+                return;
+            }
+
+            // Parse the response here on the worker thread.
+            // 在工作线程解析response
+            Response<?> response = request.parseNetworkResponse(networkResponse);
+            // 添加标记"网络解析完成"
+            request.addMarker("network-parse-complete");
+
+            // Write to cache if applicable.
+            // TODO: Only update cache metadata instead of entire record for 304s.
+            // 如果request是可缓存的, 并且response的缓存不为null
+            if (request.shouldCache() && response.cacheEntry != null) {
+                // 将数据保存到磁盘中
+                // attention 这里进去看一下
+                mCache.put(request.getCacheKey(), response.cacheEntry);
+                // 添加标记"网络缓存已经被写入"
+                request.addMarker("network-cache-written");
+            }
+
+            // Post the response back.
+            // 将request标记为已经有一个响应来分发它
+            request.markDelivered();
+            // 分发数据
+            mDelivery.postResponse(request, response);
+            // 通知所有的listener已经有一个合法的响应被接收了
+            request.notifyListenerResponseReceived(response);
+        } catch (VolleyError volleyError) {
+            volleyError.setNetworkTimeMs(SystemClock.elapsedRealtime() - startTimeMs);
+            parseAndDeliverNetworkError(request, volleyError);
+            request.notifyListenerResponseNotUsable();
+        } catch (Exception e) {
+            VolleyLog.e(e, "Unhandled exception %s", e.toString());
+            VolleyError volleyError = new VolleyError(e);
+            volleyError.setNetworkTimeMs(SystemClock.elapsedRealtime() - startTimeMs);
+            mDelivery.postError(request, volleyError);
+            request.notifyListenerResponseNotUsable();
+        }
+    }
+
+    private void parseAndDeliverNetworkError(Request<?> request, VolleyError error) {
+        error = request.parseNetworkError(error);
+        mDelivery.postError(request, error);
+    }
+}
