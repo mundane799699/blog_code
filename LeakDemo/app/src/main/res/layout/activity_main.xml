@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="me.mundane.leakdemo.MainActivity"
+    >
+
+  <LinearLayout
+      android:orientation="vertical"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      >
+    <Button
+        android:id="@+id/btn_static_activity"
+        android:text="静态activity造成的泄漏"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <Button
+        android:id="@+id/btn_asynctask_leak"
+        android:text="asynctask造成的内存泄漏"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <Button
+        android:id="@+id/btn_singleton_leak"
+        android:text="单例造成的内存泄漏"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <Button
+        android:id="@+id/btn_static_view"
+        android:text="静态View造成的内存泄漏"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <Button
+        android:id="@+id/btn_runnable_leak"
+        android:text="runnable造成的内存泄漏"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <Button
+        android:id="@+id/btn_handler_leak"
+        android:text="handler造成的内存泄漏"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+  </LinearLayout>
+
+
+</ScrollView>
