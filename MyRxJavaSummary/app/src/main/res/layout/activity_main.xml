@@ -105,6 +105,11 @@
             android:onClick="merge"
             style="@style/btn"/>
 
+        <Button
+            android:text="asynctask"
+            android:onClick="asynctask"
+            style="@style/btn"/>
+
     </LinearLayout>
 
 
