@@ -10,10 +10,12 @@ import me.mundane.myrxjavasummary.network.APIFactory;
 import me.mundane.myrxjavasummary.network.RxSchedulersHelper;
 import me.mundane.myrxjavasummary.network.api.GankAPI;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.functions.Action0;
 
 public class RetrofitActivity extends BaseActivity {
     private static final String TAG = "RetrofitActivity";
+    private Subscription mSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +23,7 @@ public class RetrofitActivity extends BaseActivity {
         setContentView(R.layout.activity_retrofit);
         GankAPI gankAPI = APIFactory.createGankAPI();
         // 这里的gankAPI.getMeiziData(10, 1)代替之前的call
-        gankAPI.getMeiziData(10, 1)
+        mSubscription = gankAPI.getMeiziData(10, 1)
                 .compose(RxSchedulersHelper.<GankMeiziResult>io2main())
                 .doOnSubscribe(new Action0() {
                     @Override
@@ -47,5 +49,13 @@ public class RetrofitActivity extends BaseActivity {
                         Toast.makeText(RetrofitActivity.this, "请求完成", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mSubscription != null && mSubscription.isUnsubscribed()) {
+            mSubscription.unsubscribe();
+        }
+        super.onDestroy();
     }
 }

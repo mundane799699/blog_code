@@ -106,6 +106,12 @@
             style="@style/btn"/>
 
         <Button
+            android:text="merge2"
+            android:onClick="merge2"
+            style="@style/btn"
+            />
+
+        <Button
             android:text="asynctask"
             android:onClick="asynctask"
             style="@style/btn"/>

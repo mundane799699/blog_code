@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="me.mundane.viewanalysis.MainActivity"
+    >
+
+    <me.mundane.viewanalysis.view.MyTestView
+        android:background="@android:color/holo_orange_light"
+        android:id="@+id/mytestview"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        />
+
+    <me.mundane.viewanalysis.view.MyTestViewgroup
+        android:id="@+id/mytestviewgroup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <Button
+            android:id="@+id/btn"
+            android:text="hello"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+    </me.mundane.viewanalysis.view.MyTestViewgroup>
+
+</LinearLayout>

@@ -45,9 +45,24 @@ public class MainActivity extends AppCompatActivity {
         registerThrottleFirst();
     }
 
+    public void test() {
+        Observable.create(new OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+
+            }
+        }).map(new Func1<Integer, Object>() {
+            @Override
+            public Object call(Integer integer) {
+                return null;
+            }
+        });
+    }
+
     public void subscribe(View view) {
         // 开关作为被观察者
         Observable<String> switcher = Observable.create(new Observable.OnSubscribe<String>() {
+
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 subscriber.onNext("on");
@@ -60,6 +75,11 @@ public class MainActivity extends AppCompatActivity {
 
         // 电灯作为观察者, 对始终在观察者开关的动作, 对开关的动作而做出相应的反应
         Subscriber<String> light = new Subscriber<String>() {
+            @Override
+            public void onStart() {
+                super.onStart();
+            }
+
             @Override
             public void onCompleted() {
                 Log.d(TAG, "onCompleted: ");
@@ -303,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
-                Log.d(TAG, "call: thread = " + Thread.currentThread().getName());
+                Log.d(TAG, "事件发出: thread = " + Thread.currentThread().getName());
                 subscriber.onNext(1);
                 subscriber.onNext(2);
                 subscriber.onCompleted();
@@ -312,10 +332,10 @@ public class MainActivity extends AppCompatActivity {
                 .doOnSubscribe(new Action0() { // doOnSubscribe在subscribe()调用后而且在事件发送前执行
                     @Override
                     public void call() {
-                        Log.d(TAG, "call: thread = " + Thread.currentThread().getName());
+                        Log.d(TAG, "doOnSubscribe: thread = " + Thread.currentThread().getName());
                         Log.d(TAG, "call: 数据发送之前显示progressbar");
                     }
-                }).subscribeOn(AndroidSchedulers.mainThread()) // 指定doOnSubscribe()发生在主线程
+                }).subscribeOn(Schedulers.io()) // 指定doOnSubscribe()发生在主线程
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() {
             @Override
             public void call(Integer integer) {
@@ -535,17 +555,37 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    public void merge2(View view) {
+        Observable<Integer> t1 = Observable.just(1, 2, 3);
+        Observable<Integer> t2 = Observable.just(4, 5, 6);
+        Observable<Observable<Integer>> tt = Observable.just(t1, t2);
+        Observable.merge(tt).subscribe(new Subscriber<Integer>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Integer integer) {
+                Log.d(TAG, "onNext: integer = " + integer);
+            }
+        });
+    }
+
     // 使用rxjava代替asynctask
     public void asynctask(View view) {
-
 
         Observable.create(new OnSubscribe<List<DBFlowModel>>() {
             @Override
             public void call(Subscriber<? super List<DBFlowModel>> subscriber) {
                 Log.d(TAG, "call: thread = " + Thread.currentThread().getName());
-                List<DBFlowModel> dbFlowModels = SQLite.select()
-                        .from(DBFlowModel.class)
-                        .queryList();
+                List<DBFlowModel> dbFlowModels =
+                        SQLite.select().from(DBFlowModel.class).queryList();
                 subscriber.onNext(dbFlowModels);
                 subscriber.onCompleted();
             }

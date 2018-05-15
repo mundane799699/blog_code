@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>mundane</title>
+
+        <!--JS代码-->
+        <script>
+               // Android需要调用的方法
+               function callJS() {
+                  alert('Android调用了JS的callJS方法');
+                  document.getElementById('content').innerHTML = '<br\>JAVA调用了JS的无参函数';
+                  var result = '这是callJS()函数的返回值';
+                  jsCallAndroid.jsMethod(result);
+               }
+
+               function callJS2(msg) {
+                   document.getElementById('content').innerHTML = '<br\>JAVA传递给js的消息是' + msg;
+               }
+
+               function callAndroid() {
+                   /*约定的url协议为：js://webview?arg1=111&arg2=222*/
+                   document.location = 'js://webview?arg1=111&arg2=222';
+               }
+
+               function clickPrompt() {
+                   // 调用prompt（）
+                   var result = prompt('js://webview?arg1=111&arg2=222');
+                   document.getElementById('content').innerHTML = '成功了' + result;
+               }
+        </script>
+    </head>
+    <body>
+    HTML 内容显示 <br/>
+    <h3><div id="content">内容显示</div></h3>
+    <br/>
+    <input type="button"  value="addJavascriptInterface调用java代码" onclick="jsCallAndroid.jsCall('这是参数')" />
+    <br/>
+    <input type="button"  value="shouldOverrideUrlLoading调用java代码" onclick="callAndroid()" />
+    <br/>
+    <input type="button"  value="onJsPrompt调用java代码" onclick="clickPrompt()" />
+    <br/>
+    </body>
+</html>
