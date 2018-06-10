@@ -3,4 +3,9 @@
     <string name="inject">\@inject</string>
     <string name="singleton">\@Singleton</string>
     <string name="subcomponent">\@Subcomponent</string>
+    <string name="qualifier">\@Qualifier</string>
+    <string name="binds">\@Binds</string>
+    <string name="intoset">\@IntoSet</string>
+    <string name="intomap">\@IntoMap</string>
+    <string name="component_builder">Component.Builder</string>
 </resources>

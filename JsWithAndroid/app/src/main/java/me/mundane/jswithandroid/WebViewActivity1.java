@@ -16,6 +16,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 public class WebViewActivity1 extends AppCompatActivity {
 
@@ -37,8 +38,12 @@ public class WebViewActivity1 extends AppCompatActivity {
 
         // 先载入JS代码
         // 格式规定为:file:///android_asset/文件名.html
-        mWebView.loadUrl("file:///android_asset/web.html");
-        mWebView.addJavascriptInterface(new AndroidtoJs(), "jsCallAndroid");
+        //mWebView.loadUrl("file:///android_asset/web.html");
+        WebSettings settings = mWebView.getSettings();
+        String ua = settings.getUserAgentString();
+        settings.setUserAgentString(ua + "openInApp");
+        mWebView.loadUrl("http://10.1.1.55:8080/loanProd/loanIndex.html");
+        //mWebView.addJavascriptInterface(new AndroidtoJs(), "jsCallAndroid");
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
@@ -56,10 +61,18 @@ public class WebViewActivity1 extends AppCompatActivity {
                 return true;
             }
         });
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
+        });
     }
 
     public void loadUrlCallJs(View view) {
         String param = "this is param";
+        // "javascript:callJS2('hello world')"
         mWebView.loadUrl("javascript:callJS2('" + param + "')");
     }
 

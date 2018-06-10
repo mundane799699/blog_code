@@ -52,6 +52,8 @@ public class WebActivity2 extends AppCompatActivity {
                 // 根据协议的参数，判断是否是所需要的url(原理同方式2)
                 // 一般根据scheme（协议格式） & authority（协议名）判断（前两个参数）
                 // 假定传入进来的 url = "js://webview?arg1=111&arg2=222"（同时也是约定好的需要拦截的）
+                // url = "android:"
+                // url = "ios://face"
 
                 Uri uri = Uri.parse(message);
                 // 如果url的协议 = 预先约定的 js 协议
@@ -60,7 +62,7 @@ public class WebActivity2 extends AppCompatActivity {
                     // 如果 authority  = 预先约定协议里的 webview，即代表都符合约定的协议
                     // 所以拦截url,下面JS开始调用Android需要的方法
                     if (uri.getAuthority().equals("webview")) {
-                        // 执行JS所需要调用的逻辑
+                        uri.getQueryParameter("key1");
                         System.out.println("js调用了Android的方法");
                         // 可以在协议上带有参数并传递到Android上
                         HashMap<String, String> params = new HashMap<>();
@@ -74,6 +76,7 @@ public class WebActivity2 extends AppCompatActivity {
                 return super.onJsPrompt(view, url, message, defaultValue, result);
             }
         });
+
 
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
@@ -104,6 +107,7 @@ public class WebActivity2 extends AppCompatActivity {
             }
         });
     }
+
 
     // 定义一个与JS对象映射关系的Android类AndroidtoJs , 继承自Object类
     private class AndroidtoJs extends Object {

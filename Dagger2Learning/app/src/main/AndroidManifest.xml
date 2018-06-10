@@ -27,6 +27,20 @@
         </activity>
         <activity android:name=".activity.SubcomponentActivity">
         </activity>
+        <activity android:name=".activity.QualifierActivity">
+        </activity>
+        <activity android:name=".activity.LazyActivity">
+        </activity>
+        <activity android:name=".activity.BindsActivity">
+        </activity>
+        <activity android:name=".activity.IntoSetActivity">
+        </activity>
+        <activity android:name=".activity.IntoMapActivity">
+        </activity>
+        <activity android:name=".activity.BindsInstanceActivity">
+        </activity>
+        <activity android:name=".activity.ComponentBuilderActivity">
+        </activity>
     </application>
 
 </manifest>

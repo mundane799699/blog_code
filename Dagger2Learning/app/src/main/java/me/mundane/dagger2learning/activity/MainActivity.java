@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mRl = findViewById(R.id.rl);
-        DaggerMainComponent.builder().textViewModule(new TextViewModule(this)).build().inject(this);
+        DaggerMainComponent.builder().textViewModule(new TextViewModule(getApplicationContext())).build().inject(this);
         Log.d(TAG, "mUser = " + mUser);
         Log.d(TAG, "mTv = " + mTv);
         mTv.setText("mUser = " +  mUser);

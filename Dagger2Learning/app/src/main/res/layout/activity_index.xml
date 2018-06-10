@@ -35,6 +35,56 @@
             android:layout_height="wrap_content"
             />
 
+        <Button
+            android:onClick="qualifier"
+            android:text="@string/qualifier"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <Button
+            android:text="lazy和provider"
+            android:onClick="lazyAndProvider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <Button
+            android:text="@string/binds"
+            android:onClick="binds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <Button
+            android:onClick="intoset"
+            android:text="@string/intoset"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <Button
+            android:onClick="intomap"
+            android:text="@string/intomap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <Button
+            android:text="bindsInstance"
+            android:onClick="bindsInstance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <Button
+            android:text="@string/component_builder"
+            android:onClick="componentBuilder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+
     </LinearLayout>
 
 </ScrollView>
